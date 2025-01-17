@@ -1,91 +1,258 @@
-<!DOCTYPE html> <!-- 코드 출처: i-ri.tistory.com/32 -->
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>게시판</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body style="background-color: white;">
-  <div class="hero text-center text-black py-5">
-    <h1 class="display-4">게시판</h1>
-    <h2>이상한 글 쓰기 좋은 곳</h2>
-  </div>
-  <div class="container my-5">
-    <form onsubmit="addPost(); return false;">
-      <div class="form-group">
-        <label for="title">제목</label>
-        <input type="text" class="form-control" id="title" name="title" placeholder="제목을 입력하십시오">
-      </div>
-      <div class="form-group">
-        <label for="content">내용</label>
-        <textarea class="form-control" id="content" name="content" placeholder="내용을 입력하십시오" rows="8"></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary">게시글 작성</button>
-    </form>
-    <div id="posts"></div>
-    <nav>
-      <ul class="pagination justify-content-center my-5">
-        <li class="page-item disabled">
-          <a class="page-link" href="#" tabindex="-1">이전</a>
-        </li>
-        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item">
-          <a class="page-link" href="#">다음</a>
-        </li>
-      </ul>
-    </nav>
-  </div>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script>
-    function getPosts() {
-      var posts = localStorage.getItem("posts");
-      if (posts) {
-        document.getElementById("posts").innerHTML = posts;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>게시판</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      .card-text,
+      .card-img-bottom {
+        display: none;
       }
-    }
+      .card:hover .card-text,
+      .card:hover .card-img-bottom {
+        display: block;
+      }
+    </style>
+  </head>
+  <body style="background-color: white">
+    <div class="hero text-center text-black py-5">
+      <h1 class="display-4">게시판</h1>
+      <h2>이상한 글 쓰기 좋은 곳</h2>
+      <div class="btn-group my-3" role="group" aria-label="게시판">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="showBoard('notice')"
+        >
+          공지사항
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="showBoard('board1')"
+        >
+          게시판 1
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="showBoard('board2')"
+        >
+          게시판 2
+        </button>
+      </div>
+    </div>
+    <div class="container my-5">
+      <div id="notice">
+        <button
+          type="button"
+          class="btn btn-primary my-3"
+          onclick="addPostPage('notice')"
+        >
+          게시글 작성
+        </button>
+      </div>
+      <div id="board1">
+        <button
+          type="button"
+          class="btn btn-primary my-3"
+          onclick="addPostPage('board1')"
+        >
+          게시글 작성
+        </button>
+      </div>
+      <div id="board2">
+        <button
+          type="button"
+          class="btn btn-primary my-3"
+          onclick="addPostPage('board2')"
+        >
+          게시글 작성
+        </button>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="addPostModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="addPostModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addPostModalLabel">게시글 작성</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form onsubmit="addPost(event)">
+              <div class="form-group">
+                <label for="postTitle">제목</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="postTitle"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="postContent">내용</label>
+                <textarea
+                  class="form-control"
+                  id="postContent"
+                  rows="5"
+                  required
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label for="postImage">이미지 첨부</label>
+                <input type="file" class="form-control-file" id="postImage" />
+              </div>
+              <button type="submit" class="btn btn-primary">작성</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      function getPosts(boardId) {
+        var posts = localStorage.getItem(boardId);
+        if (posts) {
+          document.getElementById(boardId).innerHTML = posts;
+          var deleteBtns = document.querySelectorAll(
+            "#" + boardId + " .btn-danger"
+          );
+          for (var i = 0; i < deleteBtns.length; i++) {
+            deleteBtns[i].addEventListener("click", function () {
+              this.parentNode.parentNode.remove();
+              savePosts(boardId);
+            });
+          }
+        }
+      }
+      function savePosts(boardId) {
+        var postsDiv = document.getElementById(boardId);
+        localStorage.setItem(boardId, postsDiv.innerHTML);
+      }
 
-    function savePosts() {
-      var postsDiv = document.getElementById("posts");
-      localStorage.setItem("posts", postsDiv.innerHTML);
-    }
+      function addPost(event) {
+        event.preventDefault();
+        var boardId = document.getElementById("addPostModal").dataset.boardId;
+        var title = document.getElementById("postTitle").value;
+        var content = document.getElementById("postContent").value;
+        var date = new Date().toLocaleString();
 
-   function addPost() {
-  var title = document.getElementById("title").value;
-  var content = document.getElementById("content").value;
-  var date = new Date().toLocaleString(); // 현재 시간을 문자열로 변환
-
-  var postDiv = document.createElement("div");
-  postDiv.className = "card my-3";
-  postDiv.innerHTML = `
+        var postDiv = document.createElement("div");
+        postDiv.className = "card my-3";
+        postDiv.innerHTML = `
     <div class="card-body">
       <h3 class="card-title">${title}</h3>
       <p class="card-text">${content}</p>
       <p class="card-text"><small class="text-muted">${date}</small></p>
-      <img class="card-img-bottom" src="images/3.webp" alt="이미지">
       <button type="button" class="btn btn-danger my-3">삭제</button>
+    </div>
+    <div class="card-footer">
+      <form onsubmit="addComment(event)">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="댓글을 입력하세요" required>
+        </div>
+        <button type="submit" class="btn btn-primary">작성</button>
+      </form>
+      <div class="comments mt-3">
+      </div>
     </div>
   `;
 
-  postDiv.querySelector(".btn-danger").addEventListener("click", function() {
-    postDiv.remove();
-    savePosts();
-  });
+        var cardText = postDiv.querySelector(".card-text");
 
-  var postsDiv = document.getElementById("posts");
-  postsDiv.insertBefore(postDiv, postsDiv.firstChild);
+        var postImage = document.getElementById("postImage");
+        postImage.addEventListener("change", function () {
+          var reader = new FileReader();
+          reader.onload = function () {
+            var imgPreview = document.createElement("img");
+            imgPreview.src = reader.result;
+            imgPreview.style.maxWidth = "100%";
+            postDiv.insertBefore(imgPreview, cardText);
+          };
+          reader.readAsDataURL(postImage.files[0]);
+        });
 
-  savePosts();
+        var deleteBtn = postDiv.querySelector(".btn-danger");
+        deleteBtn.addEventListener("click", function () {
+          postDiv.remove();
+          savePosts(boardId);
+        });
 
-  document.getElementById("title").value = "";
-  document.getElementById("content").value = "";
-}
+        var postsDiv = document.querySelector("#" + boardId);
+        postsDiv.insertBefore(postDiv, postsDiv.firstChild);
 
+        savePosts(boardId);
 
+        document.getElementById("postTitle").value = "";
+        document.getElementById("postContent").value = "";
+        document.getElementById("postImage").value = "";
+
+        $("#addPostModal").modal("hide");
+      }
+
+      function addComment(event) {
+        event.preventDefault();
+        var commentInput = event.target.querySelector("input");
+        var commentText = commentInput.value;
+        var date = new Date().toLocaleString();
+
+        var commentDiv = document.createElement("div");
+        commentDiv.className = "card my-3";
+        commentDiv.innerHTML = `
+    <div class="card-body">
+      <p class="card-text">${commentText}</p>
+      <p class="card-text"><small class="text-muted">${date}</small></p>
+    </div>
+  `;
+
+        var commentsDiv = event.target.parentNode.querySelector(".comments");
+        commentsDiv.insertBefore(commentDiv, commentsDiv.firstChild);
+
+        commentInput.value = "";
+      }
+
+      function addPostPage(boardId) {
+        $("#addPostModal").modal("show");
+        document.getElementById("addPostModalLabel").innerHTML =
+          "게시글 작성 - " + boardId;
+        document.getElementById("addPostModal").dataset.boardId = boardId;
+      }
+
+      function showBoard(boardId) {
+        var boards = document.querySelectorAll(".container > div");
+        for (var i = 0; i < boards.length; i++) {
+          boards[i].style.display = "none";
+        }
+        document.getElementById(boardId).style.display = "block";
+        getPosts(boardId);
+      }
+
+      showBoard("notice");
+    </script>
+  </body>
+</html>
+<!-- 출처: https://i-ri.tistory.com/39 [이리의 맥 이야기:티스토리] -->
     getPosts();
   </script>
 </body>
