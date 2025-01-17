@@ -54,34 +54,37 @@
       localStorage.setItem("posts", postsDiv.innerHTML);
     }
 
-    function addPost() {
-      var title = document.getElementById("title").value;
-      var content = document.getElementById("content").value;
+   function addPost() {
+  var title = document.getElementById("title").value;
+  var content = document.getElementById("content").value;
+  var date = new Date().toLocaleString(); // 현재 시간을 문자열로 변환
 
-      var postDiv = document.createElement("div");
-      postDiv.className = "card my-3";
-      postDiv.innerHTML = `
-        <div class="card-body">
-          <h3 class="card-title">${title}</h3>
-          <p class="card-text">${content}</p>
-          <img class="card-img-bottom" src="images/3.webp" alt="이미지">
-          <button type="button" class="btn btn-danger my-3">삭제</button>
-        </div>
-      `;
+  var postDiv = document.createElement("div");
+  postDiv.className = "card my-3";
+  postDiv.innerHTML = `
+    <div class="card-body">
+      <h3 class="card-title">${title}</h3>
+      <p class="card-text">${content}</p>
+      <p class="card-text"><small class="text-muted">${date}</small></p>
+      <img class="card-img-bottom" src="images/3.webp" alt="이미지">
+      <button type="button" class="btn btn-danger my-3">삭제</button>
+    </div>
+  `;
 
-      postDiv.querySelector(".btn-danger").addEventListener("click", function() {
-        postDiv.remove();
-        savePosts();
-      });
+  postDiv.querySelector(".btn-danger").addEventListener("click", function() {
+    postDiv.remove();
+    savePosts();
+  });
 
-      var postsDiv = document.getElementById("posts");
-      postsDiv.insertBefore(postDiv, postsDiv.firstChild);
+  var postsDiv = document.getElementById("posts");
+  postsDiv.insertBefore(postDiv, postsDiv.firstChild);
 
-      savePosts();
+  savePosts();
 
-      document.getElementById("title").value = "";
-      document.getElementById("content").value = "";
-    }
+  document.getElementById("title").value = "";
+  document.getElementById("content").value = "";
+}
+
 
     getPosts();
   </script>
